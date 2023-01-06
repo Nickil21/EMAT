@@ -8,3 +8,4 @@ setuptools==58.0.4
 stanfordcorenlp==3.9.1.1
 tqdm==4.62.3
 rouge==1.0.1
+sentencepiece

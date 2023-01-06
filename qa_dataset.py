@@ -33,7 +33,7 @@ class QADataset(Dataset):
         for idx, i in enumerate(self.data):
             i["idx"] = idx
             i["normalized_answer"] = [normalize_answer(ans) for ans in i["answer"]]
-        assert dataset_name in ["nq", "tq", "wq"]
+        assert dataset_name in ["nq", "tq", "wq", "hq"]
         self.max_source_length = max_source_length if max_source_length is not None else 430
         self.dataset_name = dataset_name
         print(f"dataset-name: {dataset_name}")

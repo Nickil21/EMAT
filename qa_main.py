@@ -29,6 +29,11 @@ DATA_PATHS = {
         "train": "./data/annotated_datasets/WQ-trainmodel.jsonl",
         "validation": "./data/annotated_datasets/WQ-val.jsonl",
         "test": "./data/annotated_datasets/WQ-test.jsonl"
+    },
+    "hq": {
+        "train": "./data/annotated_datasets/HQ-open.train-train.jsonl",
+        "validation": "./data/annotated_datasets/HQ-open.train-dev.jsonl",
+        "test": "./data/annotated_datasets/HQ-open.train-dev.jsonl"  # Test = Validation (to avoid 'null' answers)
     }
 }
 QA_KB_PATHS = {
@@ -118,7 +123,7 @@ def main():
         qa_trainer.train()
     elif args.do_test:
         logging.info("Only do test.")
-        ckpt_load_path = os.path.join(args.output_dir, "best_ckpt/pytorch_model.bin")
+        ckpt_load_path = os.path.join(args.model_name_or_path, "pytorch_model.bin")
         em_score, match_metric, ret_qas, gen_ans = qa_trainer.evaluate(
             qa_trainer.test_dataset, extend_mem_from="train_dev",
             update_key_memory=True, ckpt_load_path=ckpt_load_path
