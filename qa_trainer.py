@@ -5,7 +5,7 @@ import os
 import random
 from itertools import chain
 from typing import List, Dict, Optional
-from emat.evaluation.eval_retriever import eval_retriever, eval_generation_em
+from emat.evaluation.eval_retriever import eval_retriever, eval_generation_em, eval_generation_f1
 from utils.dr_utils import update_local_qas_to_retrieve, update_batch_inputs, rank_exist_local_qas
 from utils.utils import reduce_query_or_key_embeds
 import datasets
@@ -331,9 +331,9 @@ class QATrainer:
 
             if args.do_eval and epoch % args.eval_freq == 0:
                 # if args.do_eval: self.key_memory is up-to-date.
-                em_score, matching_metric, _, _ = self.evaluate(dataset=self.dev_dataset, extend_mem_from="train",
+                em_score, f1_score, matching_metric, _, _ = self.evaluate(dataset=self.dev_dataset, extend_mem_from="train",
                                                                 use_retrieval_adapter=args.only_train_adapter)
-                logger.info(f"epoch {epoch} eval - EM: {em_score:.3f}")
+                logger.info(f"epoch {epoch} eval - EM: {em_score:.3f} eval - F1: {f1_score:.3f}")
                 if self.accelerator.is_local_main_process and _has_wandb:
                     wandb.log({"em_dev": em_score, "epoch": epoch})
                     for k, v in matching_metric.items():
@@ -363,12 +363,13 @@ class QATrainer:
 
         # do-test
         best_model_state_dict = os.path.join(args.output_dir, "best_ckpt/pytorch_model.bin")
-        em_score, matching_metric, _, _ = self.evaluate(dataset=self.test_dataset, extend_mem_from="train_dev",
+        em_score, f1_score, matching_metric, _, _ = self.evaluate(dataset=self.test_dataset, extend_mem_from="train_dev",
                                                         update_key_memory=True, ckpt_load_path=best_model_state_dict,
                                                         use_retrieval_adapter=args.only_train_adapter)
 
         if self.accelerator.is_local_main_process:
             logger.info(f"em_test: {em_score:.3f}")
+            logger.info(f"f1_test: {f1_score:.3f}")
             for k, v in matching_metric.items():
                 logger.info(f"test_{k}: {v}")
             if _has_wandb:
@@ -554,11 +555,12 @@ class QATrainer:
 
         matching_metric = eval_retriever(dataset.data, all_retrieved_qas, "1,2,3,4,5,10,50")
         em_score = eval_generation_em(dataset.data, all_gen_ans) * 100
+        f1_score = eval_generation_f1(dataset.data, all_gen_ans) * 100
 
         assert original_key_length == sum(len(k) for k in self.key_memory)
         assert original_key_length == len(self.qas_to_retrieve)
 
-        return em_score, matching_metric, all_retrieved_qas, all_gen_ans
+        return em_score, f1_score, matching_metric, all_retrieved_qas, all_gen_ans
 
 
 if __name__ == '__main__':

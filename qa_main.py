@@ -124,13 +124,14 @@ def main():
     elif args.do_test:
         logging.info("Only do test.")
         ckpt_load_path = os.path.join(args.model_name_or_path, "pytorch_model.bin")
-        em_score, match_metric, ret_qas, gen_ans = qa_trainer.evaluate(
+        em_score, f1_score, match_metric, ret_qas, gen_ans = qa_trainer.evaluate(
             qa_trainer.test_dataset, extend_mem_from="train_dev",
             update_key_memory=True, ckpt_load_path=ckpt_load_path
 
         )
 
         logging.info(f"em_test: {em_score:.3f}")
+        logging.info(f"f1_test: {f1_score:.3f}")
         for k, v in match_metric.items():
             logging.info(f"test_{k}: {v}")
         results = []

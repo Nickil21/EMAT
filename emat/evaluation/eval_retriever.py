@@ -6,7 +6,7 @@
 # LICENSE file in the root directory of this source tree.
 import argparse
 
-from emat.evaluation.exact_match import metric_max_over_ground_truths, exact_match_score
+from emat.evaluation.exact_match import metric_max_over_ground_truths, exact_match_score, f1_score
 from emat.utils import load_jsonl
 
 
@@ -17,6 +17,15 @@ def eval_generation_em(refs, preds):
         ref_answer = ref["answer"]
         em = metric_max_over_ground_truths(exact_match_score, pred, ref_answer)
         scores.append(em)
+    avg_score = sum(scores) / len(scores)
+    return avg_score
+
+def eval_generation_f1(refs, preds):
+    scores = []
+    for ref, pred in zip(refs, preds):
+        ref_answer = ref["answer"]
+        f1 = metric_max_over_ground_truths(f1_score, pred, ref_answer)
+        scores.append(f1)
     avg_score = sum(scores) / len(scores)
     return avg_score
 
