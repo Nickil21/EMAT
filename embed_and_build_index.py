@@ -30,16 +30,16 @@ def get_args():
     parser.add_argument("--model_name_or_path", type=str, required=False,
                         default="./outputs/nq_checkpoints/KL=3;kdim=1536;VL=7;VN=10;cat_k_delay+v;t5-base;pos_from_top=128;/best_ckpt/")
     parser.add_argument("--qas_to_retrieve_from", choices=list(QA_KB_PATHS.keys()), default=f"debug")
-    parser.add_argument("--add_nq_train", action="store_true")
-    parser.add_argument("--add_nq_dev", action="store_true")
+    parser.add_argument("--add_hq_train", action="store_true")  # parser.add_argument("--add_nq_train", action="store_true") 
+    parser.add_argument("--add_hq_dev", action="store_true")    # parser.add_argument("--add_nq_dev", action="store_true")
     parser.add_argument("--embed_batch_size", type=int, default=512)
-    parser.add_argument("--save_dir", default=f"./data/embedding_and_faiss/debug_from_nq_ckpt")
+    parser.add_argument("--save_dir", default=f"./data/embedding_and_faiss/debug_from_hq_ckpt")
 
     args = parser.parse_args()
     return args
 
 
-def load_qas_to_embed(qas_to_retrieve_from, add_nq_train, add_nq_dev):
+def load_qas_to_embed(qas_to_retrieve_from, add_hq_train, add_hq_dev):
     logging.info("loading qas to retrieve")
     qas_to_retrieve_fp = QA_KB_PATHS[qas_to_retrieve_from]
     logging.info(f"loading qas from {qas_to_retrieve_fp}")
@@ -54,12 +54,20 @@ def load_qas_to_embed(qas_to_retrieve_from, add_nq_train, add_nq_dev):
     # if qas_to_retrieve_from == "debug":
     #     qas_to_retrieve = qas_to_retrieve[:10000]
 
-    if add_nq_train:
-        logging.info("add nq-train qas.")
-        qas_to_embed = qas_to_embed + load_jsonl("./data/annotated_datasets/NQ-open.train-train.jsonl")
-    if add_nq_dev:
-        logging.info("add nq-dev qas.")
-        qas_to_embed = qas_to_embed + load_jsonl("./data/annotated_datasets/NQ-open.train-dev.jsonl")
+    # if add_nq_train:
+    #     logging.info("add nq-train qas.")
+    #     qas_to_embed = qas_to_embed + load_jsonl("./data/annotated_datasets/NQ-open.train-train.jsonl")
+    # if add_nq_dev:
+    #     logging.info("add nq-dev qas.")
+    #     qas_to_embed = qas_to_embed + load_jsonl("./data/annotated_datasets/NQ-open.train-dev.jsonl")
+
+    if add_hq_train:
+        logging.info("add hq-train qas.")
+        qas_to_embed = qas_to_embed + load_jsonl("./data/annotated_datasets/HQ-open.train-train.jsonl")
+    if add_hq_dev:
+        logging.info("add hq-dev qas.")
+        qas_to_embed = qas_to_embed + load_jsonl("./data/annotated_datasets/HQ-open.train-dev.jsonl")
+
 
     logging.info(f"load {len(qas_to_embed)} qas totally.")
 
@@ -173,7 +181,8 @@ def main():
     logging.info(f"model load info: {load_info}")
 
     logging.info("loading data")
-    data_to_embed = load_qas_to_embed(args.qas_to_retrieve_from, args.add_nq_train, args.add_nq_dev)
+    data_to_embed = load_qas_to_embed(args.qas_to_retrieve_from, args.add_hq_train, args.add_hq_dev)
+    # data_to_embed = load_qas_to_embed(args.qas_to_retrieve_from, args.add_nq_train, args.add_nq_dev)
 
     logging.info("embedding")
     embed_key_value(model, tokenizer, data_to_embed, args.embed_batch_size, args.save_dir)

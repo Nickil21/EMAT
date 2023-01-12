@@ -25,5 +25,6 @@ save_hq_dataset("test")
 
 if not os.path.exists("data/annotated_datasets/"):
    os.makedirs("data/annotated_datasets/")
+   os.makedirs("data/embedding_and_faiss/")
 
 subprocess.call("mv *.jsonl data/annotated_datasets/", shell=True)

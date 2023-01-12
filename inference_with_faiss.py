@@ -35,7 +35,7 @@ def get_args():
     parser.add_argument("--add_nq_train", action="store_true")
     parser.add_argument("--add_nq_dev", action="store_true")
     parser.add_argument("--inference_batch_size", type=int, default=512)
-    parser.add_argument("--load_dir", default=f"./data/embedding_and_faiss/debug_from_nq_ckpt")
+    parser.add_argument("--load_dir", default=f"./data/embedding_and_faiss/debug_from_hq_ckpt")
     parser.add_argument("--inference_type", type=str, default="async", choices=["async", "serial", "t5"])
     parser.add_argument("--cat_layer", default=7, type=int)
     parser.add_argument("--test_task", default="wow", type=str, choices=["qa", "wow", "eli5"])

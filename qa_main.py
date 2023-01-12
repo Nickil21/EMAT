@@ -143,7 +143,7 @@ def main():
                 "retrieved_qas": [{"question": qa["question"], "answer": qa["answer"][0]} for qa in retrieved_qas],
                 "generate_answer": predict_answer,
             })
-        json.dump(results, open(os.path.join(args.output_dir, "best_ckpt/predict_results.json"), 'w'),
+        json.dump(results, open(os.path.join(args.output_dir, "predict_results.json"), 'w'),
                   indent=4, ensure_ascii=False)
 
 
